@@ -696,7 +696,6 @@ func (sm *SourceMgr) deduceFromPath(path string) (deductionFuture, error) {
 }
 
 type deductionCoordinator struct {
-	ctx      context.Context
 	callMgr  *callManager
 	rootxt   *radix.Tree
 	deducext *deducerTrie
@@ -706,17 +705,18 @@ type deductionCoordinator struct {
 func newDeductionCoordinator(cm *callManager) *deductionCoordinator {
 	dc := &deductionCoordinator{
 		callMgr:  cm,
-		ctx:      cm.getLifetimeContext(),
 		rootxt:   radix.New(),
 		deducext: pathDeducerTrie(),
+		action:   make(chan func()),
 	}
 
 	// Start listener loop
 	go func() {
 		for {
 			select {
-			case <-dc.ctx.Done():
+			case <-dc.callMgr.getLifetimeContext().Done():
 				close(dc.action)
+				return
 			case action := <-dc.action:
 				action()
 			}
@@ -727,7 +727,7 @@ func newDeductionCoordinator(cm *callManager) *deductionCoordinator {
 }
 
 func (dc *deductionCoordinator) deduceRootPath(path string) (pathDeduction, error) {
-	if dc.ctx.Err() != nil {
+	if dc.callMgr.getLifetimeContext().Err() != nil {
 		return pathDeduction{}, errors.New("deductionCoordinator has been terminated")
 	}
 
