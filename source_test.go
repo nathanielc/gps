@@ -1,6 +1,7 @@
 package gps
 
 import (
+	"context"
 	"io/ioutil"
 	"net/url"
 	"reflect"
@@ -38,7 +39,7 @@ func TestGitSourceInteractions(t *testing.T) {
 		url: u,
 	}
 
-	isrc, ident, err := mb.try(cpath, naiveAnalyzer{})
+	isrc, ident, err := mb.try(context.Background(), cpath, newMemoryCache())
 	if err != nil {
 		t.Errorf("Unexpected error while setting up gitSource for test repo: %s", err)
 		rf()
@@ -140,7 +141,7 @@ func TestGopkginSourceInteractions(t *testing.T) {
 			major: major,
 		}
 
-		isrc, ident, err := mb.try(cpath, naiveAnalyzer{})
+		isrc, ident, err := mb.try(context.Background(), cpath, newMemoryCache())
 		if err != nil {
 			t.Errorf("Unexpected error while setting up gopkginSource for test repo: %s", err)
 			return
@@ -279,7 +280,7 @@ func TestBzrSourceInteractions(t *testing.T) {
 		url: u,
 	}
 
-	isrc, ident, err := mb.try(cpath, naiveAnalyzer{})
+	isrc, ident, err := mb.try(context.Background(), cpath, newMemoryCache())
 	if err != nil {
 		t.Errorf("Unexpected error while setting up bzrSource for test repo: %s", err)
 		rf()
@@ -388,7 +389,7 @@ func TestHgSourceInteractions(t *testing.T) {
 			url: u,
 		}
 
-		isrc, ident, err := mb.try(cpath, naiveAnalyzer{})
+		isrc, ident, err := mb.try(context.Background(), cpath, newMemoryCache())
 		if err != nil {
 			t.Errorf("Unexpected error while setting up hgSource for test repo: %s", err)
 			return

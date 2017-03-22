@@ -569,7 +569,7 @@ func (sm *SourceMgr) deduceFromPath(path string) (deductionFuture, error) {
 			c := make(chan struct{}, 1)
 			go func() {
 				defer close(c)
-				src, ident, err = mb.try(context.TODO(), cachedir, an)
+				src, ident, err = mb.try(context.TODO(), cachedir, newMemoryCache())
 			}()
 
 			return func() (source, string, error) {
@@ -677,7 +677,7 @@ func (sm *SourceMgr) deduceFromPath(path string) (deductionFuture, error) {
 			}
 
 			if m != nil {
-				src, ident, err = m.try(context.TODO(), cachedir, an)
+				src, ident, err = m.try(context.TODO(), cachedir, newMemoryCache())
 			} else {
 				err = fmt.Errorf("unsupported vcs type %s", vcs)
 			}
